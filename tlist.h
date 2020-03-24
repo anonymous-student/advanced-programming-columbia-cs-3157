@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include <list>
+#include <deque>
 #include <algorithm>
 #include <iostream>
 using namespace std;
@@ -14,8 +14,6 @@ template <typename T>
 class TList;
 template <typename T>
 ostream& operator<<(ostream& os, const TList<T>& rhs);
-template <typename T>
-TList<T> operator+(const TList<T>& lhs, const TList<T>& rhs);
 
 
 template <typename T>
@@ -51,13 +49,6 @@ class TList {
 
 	// operator+
 	// implemented using op+=(), thus doesn't need to be a friend.
-	// 
-	// Declared as friend anyway to demonstrate how to do it.
-	// Note that '::' and '()' are needed to make it compile under
-	// g++ 4.6.3.  The operator<< does not require either.
-	//
-        friend TList<T>
-            (::operator+<T>)(const TList<T>& lhs, const TList<T>& rhs);
 
 	// put-to operator
 	friend ostream& operator<< <T>(ostream& os, const TList<T>& rhs);
@@ -74,7 +65,7 @@ class TList {
 
     private:
 
-	list<T> l;
+	deque<T> l;
 };
 
 template <typename T>
@@ -106,10 +97,7 @@ ostream& operator<<(ostream& os, const TList<T>& rhs)
 template <typename T>
 T& TList<T>::operator[](int idx)
 {
-    auto iter = l.begin();
-    for (int i = 0; i < idx; i++)
-	++iter;
-    return *iter;
+    return l[idx];
 }
 
 #endif
