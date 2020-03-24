@@ -1,32 +1,24 @@
 
 #
-# Makefile for lab 3, part 1.
+# Makefile for lab 3, part 2
 #
 
 CC  = gcc
 CXX = g++
 
-INCLUDES =
+INCLUDES = -I../part1
 CFLAGS   = -g -Wall $(INCLUDES)
 CXXFLAGS = -g -Wall $(INCLUDES)
 
-LDFLAGS = -g
-LDLIBS = 
+LDFLAGS = -g -L../part1
+LDLIBS = -lmylist
 
-mylist-test: libmylist.a
-
-libmylist.a: mylist.o
-	ar rc libmylist.a mylist.o
-	ranlib libmylist.a
-
-# header dependency
-mylist-test.o: mylist.h
-mylist.o: mylist.h
+revecho:
 
 .PHONY: clean
 clean:
-	rm -f *.o *~ a.out core libmylist.a mylist-test
+	rm -f *.o *~ a.out core revecho
 
 .PHONY: all
-all: clean libmylist.a mylist-test
+all: clean revecho
 
