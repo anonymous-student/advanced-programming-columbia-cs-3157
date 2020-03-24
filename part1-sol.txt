@@ -1,0 +1,106 @@
+(a)
+
+     1	// test4.cpp
+     2	
+     3	#include "mystring.h"
+     4	
+     5	static MyString add(MyString a, MyString b)
+     6	{
+     7	    MyString t(" and ");
+     8	    return a + t + b;
+     9	}
+    10	
+    11	int main()
+    12	{
+    13	    MyString x("one");
+    14	    MyString y("two");
+    15	
+    16	    MyString z = add(x, y);
+    17	    cout << z << endl;
+    18	    return 0;
+    19	}
+
+
+BASIC4TRACE: (0x7fffc1e93ea0)->MyString(const char *)   :13,constructor,x
+BASIC4TRACE: (0x7fffc1e93eb0)->MyString(const char *)   :14,constructor,y
+BASIC4TRACE: (0x7fffc1e93ee0)->MyString(const MyString&):5 or 16,copy constructor,a
+BASIC4TRACE: (0x7fffc1e93ed0)->MyString(const MyString&):5 or 16,copy constructor,b 
+BASIC4TRACE: (0x7fffc1e93e50)->MyString(const char *)   :7,constructor,t
+BASIC4TRACE: op+(const MyString&, const MyString&)      :entering operator+
+BASIC4TRACE: (0x7fffc1e93e00)->MyString()               :8,constructor,temp (holds the value a+t)
+BASIC4TRACE: (0x7fffc1e93e60)->MyString(const MyString&):8,copy constructor,u1 from return temp 
+BASIC4TRACE: (0x7fffc1e93e00)->~MyString()              :8,destructor,temp
+BASIC4TRACE: op+(const MyString&, const MyString&)      :entering operator+
+BASIC4TRACE: (0x7fffc1e93e00)->MyString()               :8,constructor,temp (holds value temp+b)
+BASIC4TRACE: (0x7fffc1e93e70)->MyString(const MyString&):8,copy constructor,u2 from return temp
+BASIC4TRACE: (0x7fffc1e93e00)->~MyString()              :8,destructor,temp
+BASIC4TRACE: (0x7fffc1e93ef0)->MyString(const MyString&):8 or 16,copy constructor,u3 from return a + t + b
+BASIC4TRACE: (0x7fffc1e93e70)->~MyString()              :9 or 8,destructor,u2
+BASIC4TRACE: (0x7fffc1e93e60)->~MyString()              :9 or 8,destructor,u1
+BASIC4TRACE: (0x7fffc1e93e50)->~MyString()              :9 or 8,destructor,t
+BASIC4TRACE: (0x7fffc1e93ec0)->MyString(const MyString&):16,copy constructor,z
+BASIC4TRACE: (0x7fffc1e93ef0)->~MyString()              :16 or 9 or 8,destructor,u3
+BASIC4TRACE: (0x7fffc1e93ed0)->~MyString()              :16 or 9 or 8,destructor,b
+BASIC4TRACE: (0x7fffc1e93ee0)->~MyString()              :16 or 9 or 8,destructor,a
+one and two                                             :cout << z << endl;
+BASIC4TRACE: (0x7fffc1e93ec0)->~MyString()              :19 or 18,destructor,z
+BASIC4TRACE: (0x7fffc1e93eb0)->~MyString()              :19 or 18,destructor,y
+BASIC4TRACE: (0x7fffc1e93ea0)->~MyString()              :19 or 18,destructor,x
+
+
+(b)
+
+BASIC4TRACE: (0x7fffe8c799a0)->MyString(const char *)
+BASIC4TRACE: (0x7fffe8c799b0)->MyString(const char *)
+
+- no copy constructions of parameters due to passing by reference
+
+BASIC4TRACE: (0x7fffe8c79950)->MyString(const char *)
+BASIC4TRACE: op+(const MyString&, const MyString&)
+BASIC4TRACE: (0x7fffe8c79900)->MyString()
+BASIC4TRACE: (0x7fffe8c79960)->MyString(const MyString&)
+BASIC4TRACE: (0x7fffe8c79900)->~MyString()
+BASIC4TRACE: op+(const MyString&, const MyString&)
+BASIC4TRACE: (0x7fffe8c79900)->MyString()
+BASIC4TRACE: (0x7fffe8c79970)->MyString(const MyString&)
+BASIC4TRACE: (0x7fffe8c79900)->~MyString()
+BASIC4TRACE: (0x7fffe8c799d0)->MyString(const MyString&)
+BASIC4TRACE: (0x7fffe8c79970)->~MyString()
+BASIC4TRACE: (0x7fffe8c79960)->~MyString()
+BASIC4TRACE: (0x7fffe8c79950)->~MyString()
+BASIC4TRACE: (0x7fffe8c799c0)->MyString(const MyString&)
+BASIC4TRACE: (0x7fffe8c799d0)->~MyString()
+
+- no destruction of parameters
+
+one and two
+BASIC4TRACE: (0x7fffe8c799c0)->~MyString()
+BASIC4TRACE: (0x7fffe8c799b0)->~MyString()
+BASIC4TRACE: (0x7fffe8c799a0)->~MyString()
+
+(c)
+
+-fno-elide-constructors
+
+   The C++ standard allows an implementation to omit creating a temporary
+   which is only used to initialize another object of the same type.
+   Specifying this option disables that optimization, and forces G++ to call
+   the copy constructor in all cases.
+
+BASIC4TRACE: (0x7fff03c75840)->MyString(const char *)
+BASIC4TRACE: (0x7fff03c75850)->MyString(const char *)
+BASIC4TRACE: (0x7fff03c75800)->MyString(const char *)
+BASIC4TRACE: op+(const MyString&, const MyString&)
+BASIC4TRACE: (0x7fff03c75810)->MyString()
+BASIC4TRACE: op+(const MyString&, const MyString&)
+BASIC4TRACE: (0x7fff03c75860)->MyString()
+BASIC4TRACE: (0x7fff03c75810)->~MyString()
+BASIC4TRACE: (0x7fff03c75800)->~MyString()
+one and two
+BASIC4TRACE: (0x7fff03c75860)->~MyString()
+BASIC4TRACE: (0x7fff03c75850)->~MyString()
+BASIC4TRACE: (0x7fff03c75840)->~MyString()
+
+- the compiler was able to eliminate all copy constructor (and the
+  corresponding destructor) calls.
+
